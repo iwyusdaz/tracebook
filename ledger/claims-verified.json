@@ -1,0 +1,134 @@
+{
+  "ledger_version": "1.0",
+  "generated": "2026-10-30T20:10:42.456Z",
+  "generator": "tracebook demo ledger (fixture run)",
+  "note": "A claims ledger surfaces factual claims and evidence for HUMAN JUDGMENT. A green ledger does NOT mean the content is 'fact-checked' or certified. The content in test-fixtures/ is FICTIONAL with SEEDED errors; source_urls point at a local fixture server (127.0.0.1:8641) started by `npm test`.",
+  "claims": [
+    {
+      "id": "C001",
+      "claim": "Large-scale randomized studies show that high-impact tutoring lifts achievement by 0.41 standard deviations on average.",
+      "location": "test-fixtures/content/module-1-tutoring.md:13",
+      "source_url": "http://127.0.0.1:8641/sources/tutoring-effect.html",
+      "source_publisher": "Lakeside State University Center for Education Research (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Across 96 randomized studies, high-impact tutoring improved achievement by 0.10 to 0.20 standard deviations, with the largest gains in early-grades reading.",
+      "verdict": "UNVERIFIED",
+      "correction_note": "",
+      "confidence": "high",
+      "apply_correction": false,
+      "suggested_correction": {
+        "find": "Large-scale randomized studies show that high-impact tutoring lifts\nachievement by 0.41 standard deviations on average.",
+        "replace": "Large-scale randomized studies show that high-impact tutoring lifts\nachievement by 0.10 to 0.20 standard deviations."
+      },
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "NUMERIC-MISMATCH",
+        "similarity": null,
+        "http_status": null,
+        "note": "The stored quote was found in the source, but the claim states number(s) [0.41] that do not appear in the quote. The claim likely misstates the source. Quote says: \"Across 96 randomized studies, high-impact tutoring improved achievement by 0.10 to 0.20 standard deviations, with the largest gains in early-grades reading.\"",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    },
+    {
+      "id": "C002",
+      "claim": "Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies.",
+      "location": "test-fixtures/content/module-1-tutoring.md:17",
+      "source_url": "http://127.0.0.1:8641/sources/tutoring-effect.html",
+      "source_publisher": "Lakeside State University Center for Education Research (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies, consistent with prior meta-analyses.",
+      "verdict": "VERIFIED",
+      "correction_note": "",
+      "confidence": "high",
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "QUOTE-FOUND",
+        "similarity": null,
+        "http_status": null,
+        "note": "Stored quote found verbatim in the live source; numbers consistent.",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    },
+    {
+      "id": "C003",
+      "claim": "One 2024 randomized trial found that structured tutoring reduced course dropout by 18 percent.",
+      "location": "test-fixtures/content/module-1-tutoring.md:22",
+      "source_url": "http://127.0.0.1:8641/sources/journal-paywalled.html",
+      "source_publisher": "Journal of Postsecondary Persistence (fictional fixture, paywalled)",
+      "access_date": "2026-10-31",
+      "stored_quote": "The trial reported an 18 percent reduction in course dropout among assigned students.",
+      "verdict": "UNVERIFIED",
+      "correction_note": "",
+      "confidence": "medium",
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "ACCESS-RESTRICTED",
+        "similarity": null,
+        "http_status": 403,
+        "note": "Source returned HTTP 403 (paywalled or blocks automated access). TraceBook labels this honestly and the source was not circumvented. Verify by hand with legitimate access.",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    },
+    {
+      "id": "C004",
+      "claim": "As of this writing, the CourseKit platform runs on version 3.8.5.",
+      "location": "test-fixtures/content/module-2-platform.md:18",
+      "source_url": "http://127.0.0.1:8641/sources/platform-changelog.html",
+      "source_publisher": "CourseKit Release Notes (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "The current release is CourseKit 3.8.5 (January 2026).",
+      "verdict": "UNVERIFIED",
+      "correction_note": "",
+      "confidence": "high",
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "QUOTE-NOT-FOUND",
+        "similarity": 0.6667,
+        "http_status": null,
+        "note": "Stored quote not found in the live source (similarity 0.6667). Either the source changed (content drift), the quote was mis-transcribed, or the source never contained it. Human judgment required.",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    },
+    {
+      "id": "C005",
+      "claim": "Retrieval practice strengthens memory more than rereading in most classroom experiments.",
+      "location": "test-fixtures/content/module-2-platform.md:11",
+      "source_url": "http://127.0.0.1:8641/sources/retrieval-practice.html",
+      "source_publisher": "Retrieval Practice Evidence Summary (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Retrieval practice strengthens memory more than rereading in 87% of classroom experiments reviewed here.",
+      "verdict": "VERIFIED-SNIPPET",
+      "correction_note": "",
+      "confidence": "high",
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "PARTIAL-MATCH",
+        "similarity": 0.8571,
+        "http_status": null,
+        "note": "Partial quote-back match (similarity 0.8571). The source text differs from the stored quote — possible content drift or a paraphrase. Human judgment required; never treated as fully verified.",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    },
+    {
+      "id": "C006",
+      "claim": "The 2019 accreditation guideline requires programs to publish their evidence base annually.",
+      "location": "test-fixtures/content/module-2-platform.md:24",
+      "source_url": "http://127.0.0.1:8641/sources/retired-guideline.html",
+      "source_publisher": "Accreditation Guideline 2019 (fictional fixture, retired page)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Programs must publish their evidence base annually.",
+      "verdict": "UNVERIFIED",
+      "correction_note": "",
+      "confidence": "medium",
+      "verification": {
+        "checked_at": "2026-10-30",
+        "reason": "SOURCE-UNREACHABLE",
+        "similarity": null,
+        "http_status": 404,
+        "note": "source unreachable (HTTP 404)",
+        "method": "deterministic quote-back (tracebook verify.mjs)"
+      }
+    }
+  ],
+  "verified_at": "2026-10-30"
+}

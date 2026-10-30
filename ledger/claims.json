@@ -1,0 +1,85 @@
+{
+  "ledger_version": "1.0",
+  "generated": "2026-10-31T00:00:00.000Z",
+  "generator": "tracebook demo ledger (fixture run)",
+  "note": "A claims ledger surfaces factual claims and evidence for HUMAN JUDGMENT. A green ledger does NOT mean the content is 'fact-checked' or certified. The content in test-fixtures/ is FICTIONAL with SEEDED errors; source_urls point at a local fixture server (127.0.0.1:8641) started by `npm test`.",
+  "claims": [
+    {
+      "id": "C001",
+      "claim": "Large-scale randomized studies show that high-impact tutoring lifts achievement by 0.41 standard deviations on average.",
+      "location": "test-fixtures/content/module-1-tutoring.md:13",
+      "source_url": "http://127.0.0.1:8641/sources/tutoring-effect.html",
+      "source_publisher": "Lakeside State University Center for Education Research (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Across 96 randomized studies, high-impact tutoring improved achievement by 0.10 to 0.20 standard deviations, with the largest gains in early-grades reading.",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "high",
+      "apply_correction": false,
+      "suggested_correction": {
+        "find": "Large-scale randomized studies show that high-impact tutoring lifts\nachievement by 0.41 standard deviations on average.",
+        "replace": "Large-scale randomized studies show that high-impact tutoring lifts\nachievement by 0.10 to 0.20 standard deviations."
+      }
+    },
+    {
+      "id": "C002",
+      "claim": "Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies.",
+      "location": "test-fixtures/content/module-1-tutoring.md:17",
+      "source_url": "http://127.0.0.1:8641/sources/tutoring-effect.html",
+      "source_publisher": "Lakeside State University Center for Education Research (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies, consistent with prior meta-analyses.",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "high"
+    },
+    {
+      "id": "C003",
+      "claim": "One 2024 randomized trial found that structured tutoring reduced course dropout by 18 percent.",
+      "location": "test-fixtures/content/module-1-tutoring.md:22",
+      "source_url": "http://127.0.0.1:8641/sources/journal-paywalled.html",
+      "source_publisher": "Journal of Postsecondary Persistence (fictional fixture, paywalled)",
+      "access_date": "2026-10-31",
+      "stored_quote": "The trial reported an 18 percent reduction in course dropout among assigned students.",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "medium"
+    },
+    {
+      "id": "C004",
+      "claim": "As of this writing, the CourseKit platform runs on version 3.8.5.",
+      "location": "test-fixtures/content/module-2-platform.md:18",
+      "source_url": "http://127.0.0.1:8641/sources/platform-changelog.html",
+      "source_publisher": "CourseKit Release Notes (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "The current release is CourseKit 3.8.5 (January 2026).",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "high"
+    },
+    {
+      "id": "C005",
+      "claim": "Retrieval practice strengthens memory more than rereading in most classroom experiments.",
+      "location": "test-fixtures/content/module-2-platform.md:11",
+      "source_url": "http://127.0.0.1:8641/sources/retrieval-practice.html",
+      "source_publisher": "Retrieval Practice Evidence Summary (fictional fixture)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Retrieval practice strengthens memory more than rereading in 87% of classroom experiments reviewed here.",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "high"
+    },
+    {
+      "id": "C006",
+      "claim": "The 2019 accreditation guideline requires programs to publish their evidence base annually.",
+      "location": "test-fixtures/content/module-2-platform.md:24",
+      "source_url": "http://127.0.0.1:8641/sources/retired-guideline.html",
+      "source_publisher": "Accreditation Guideline 2019 (fictional fixture, retired page)",
+      "access_date": "2026-10-31",
+      "stored_quote": "Programs must publish their evidence base annually.",
+      "verdict": null,
+      "correction_note": "",
+      "confidence": "medium"
+    }
+  ]
+}

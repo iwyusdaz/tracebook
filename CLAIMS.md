@@ -1,0 +1,20 @@
+# Claims Ledger
+
+> **What this is:** an evidence ledger of factual claims extracted from the content, each checked against its cited source by deterministic quote-back matching. **What this is not:** a certification that the content is 'fact-checked'. Verdicts surface claims for human judgment — a green ledger does not replace a human reviewer.
+
+_Generated 2026-10-30 by TraceBook from `ledger/claims-verified.json`._
+
+**Summary:** 6 claim(s) · 1 verified · 1 snippet-verified · 4 unverified · 0 corrected · 0 not-applicable
+
+Verdict vocabulary: **VERIFIED** (stored source quote found verbatim, numbers consistent) · **VERIFIED-SNIPPET** (partial match — possible drift or paraphrase; needs human eyes) · **UNVERIFIED** (source unreachable / access-restricted / quote not found / numbers contradict the source) · **CORRECTED** (content fixed in place with a correction note) · **NOT-APPLICABLE** (not checkable this way, human-labeled).
+
+| ID | Claim | Location | Source | Verdict | Verification note |
+|----|-------|----------|--------|---------|-------------------|
+| C001 | Large-scale randomized studies show that high-impact tutoring lifts achievement by 0.41 standard deviations on average. | test-fixtures/content/module-1-tutoring.md:13 | [Lakeside State University Center for Education Research (fictional fixture)](http://127.0.0.1:8641/sources/tutoring-effect.html) | UNVERIFIED | `NUMERIC-MISMATCH` — The stored quote was found in the source, but the claim states number(s) [0.41] that do not appear in the quote. The claim likely misstates the source. Quote says: "Across 96 randomized studies, high-impact tutoring improved achievement by 0.10 to 0.20 standard deviations, with the largest gains in early-grades reading." |
+| C002 | Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies. | test-fixtures/content/module-1-tutoring.md:17 | [Lakeside State University Center for Education Research (fictional fixture)](http://127.0.0.1:8641/sources/tutoring-effect.html) | VERIFIED | `QUOTE-FOUND` — Stored quote found verbatim in the live source; numbers consistent. |
+| C003 | One 2024 randomized trial found that structured tutoring reduced course dropout by 18 percent. | test-fixtures/content/module-1-tutoring.md:22 | [Journal of Postsecondary Persistence (fictional fixture, paywalled)](http://127.0.0.1:8641/sources/journal-paywalled.html) | UNVERIFIED | `ACCESS-RESTRICTED` — Source returned HTTP 403 (paywalled or blocks automated access). TraceBook labels this honestly and the source was not circumvented. Verify by hand with legitimate access. |
+| C004 | As of this writing, the CourseKit platform runs on version 3.8.5. | test-fixtures/content/module-2-platform.md:18 | [CourseKit Release Notes (fictional fixture)](http://127.0.0.1:8641/sources/platform-changelog.html) | UNVERIFIED | `QUOTE-NOT-FOUND` — similarity 0.6667 — Stored quote not found in the live source (similarity 0.6667). Either the source changed (content drift), the quote was mis-transcribed, or the source never contained it. Human judgment required. |
+| C005 | Retrieval practice strengthens memory more than rereading in most classroom experiments. | test-fixtures/content/module-2-platform.md:11 | [Retrieval Practice Evidence Summary (fictional fixture)](http://127.0.0.1:8641/sources/retrieval-practice.html) | VERIFIED-SNIPPET | `PARTIAL-MATCH` — similarity 0.8571 — Partial quote-back match (similarity 0.8571). The source text differs from the stored quote — possible content drift or a paraphrase. Human judgment required; never treated as fully verified. |
+| C006 | The 2019 accreditation guideline requires programs to publish their evidence base annually. | test-fixtures/content/module-2-platform.md:24 | [Accreditation Guideline 2019 (fictional fixture, retired page)](http://127.0.0.1:8641/sources/retired-guideline.html) | UNVERIFIED | `SOURCE-UNREACHABLE` — source unreachable (HTTP 404) |
+
+_Access dates and per-claim provenance live in the machine-readable ledger (ledger/claims-verified.json)._
