@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TraceBook — course content in, evidence ledger out</title>
+  <meta name="description" content="TraceBook extracts factual claims from curriculum content, verifies each against its cited source with deterministic quote-back matching, and emits a versioned claims ledger with weekly claims-rot checking.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site">
+    <div class="inner">
+      <a class="wordmark" href="index.html">TraceBook <span>· course content in, evidence ledger out</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <h1>TraceBook: an evidence ledger for curriculum claims</h1>
+
+    <p><strong>TraceBook is a CLI + GitHub Action that turns course content into a
+    versioned claims ledger.</strong> It extracts factual claims from curriculum
+    material, checks each one against its cited primary source with
+    deterministic quote-back matching, rewrites corrections in place with a
+    note, and re-checks every source weekly so citations can't rot silently.
+    It is built for curriculum developers, instructional designers, and
+    education researchers.</p>
+
+    <p class="notice-strong"><strong>What a green ledger does not mean:</strong>
+    it is <em>not</em> a certification that content is "fact-checked".
+    TraceBook surfaces claims and evidence for human judgment; a human
+    reviewer decides. Every verdict in the ledger is a prompt to look, not a
+    verdict to trust.</p>
+
+    <h2>The problem</h2>
+    <p>Every curriculum artifact makes factual claims: an effect size, a legal
+    effective date, a platform version number. Verification usually happens by
+    hand, once — and then silently rots. Sources move, versions bump, and a
+    claim drifts away from its citation with nobody noticing. This exact
+    process — claim → source → URL → access date → verdict → correction note —
+    was done manually across a seven-repo portfolio before it was productized
+    as this tool.</p>
+
+    <h2>How it works</h2>
+    <figure>
+      <svg role="img" aria-labelledby="flow-title flow-desc" viewBox="0 0 640 150" width="100%" style="max-width:640px">
+        <title id="flow-title">TraceBook pipeline: extract, verify, report, rot-check</title>
+        <desc id="flow-desc">A five-step flow. Curriculum content feeds EXTRACT (the only LLM step) into a claims ledger, which a human reviews. VERIFY fetches each source and does quote-back matching. REPORT emits CLAIMS.md and applies human-approved corrections in place. A weekly ROT CHECK re-fetches sources and opens an issue per new finding.</desc>
+        <g font-family="Helvetica, Arial, sans-serif" font-size="12">
+          <rect x="8" y="55" width="96" height="40" rx="6" fill="#eef2f6" stroke="#1f4e79"/>
+          <text x="56" y="72" text-anchor="middle">curriculum</text>
+          <text x="56" y="86" text-anchor="middle">content</text>
+          <rect x="140" y="55" width="92" height="40" rx="6" fill="#1f4e79"/>
+          <text x="186" y="72" text-anchor="middle" fill="#ffffff">1 EXTRACT</text>
+          <text x="186" y="86" text-anchor="middle" fill="#ffffff">(LLM)</text>
+          <rect x="268" y="55" width="92" height="40" rx="6" fill="#1f4e79"/>
+          <text x="314" y="72" text-anchor="middle" fill="#ffffff">2 LEDGER</text>
+          <text x="314" y="86" text-anchor="middle" fill="#ffffff">+ human gate</text>
+          <rect x="396" y="55" width="92" height="40" rx="6" fill="#1f4e79"/>
+          <text x="442" y="72" text-anchor="middle" fill="#ffffff">3 VERIFY</text>
+          <text x="442" y="86" text-anchor="middle" fill="#ffffff">quote-back</text>
+          <rect x="524" y="55" width="108" height="40" rx="6" fill="#1f4e79"/>
+          <text x="578" y="72" text-anchor="middle" fill="#ffffff">4 REPORT +</text>
+          <text x="578" y="86" text-anchor="middle" fill="#ffffff">5 ROT CHECK</text>
+          <g stroke="#1f4e79" stroke-width="2" fill="none">
+            <path d="M104 75 L138 75"/>
+            <path d="M232 75 L266 75"/>
+            <path d="M360 75 L394 75"/>
+            <path d="M488 75 L522 75"/>
+          </g>
+          <path d="M578 97 L578 128 L442 128 L442 97" stroke="#6b4a00" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+          <text x="510" y="123" text-anchor="middle" fill="#6b4a00" font-size="11">weekly re-fetch</text>
+        </g>
+      </svg>
+      <figcaption style="font-size:0.9rem;color:#4a5568">Steps 3–5 are fully deterministic scripts. Only EXTRACT uses a language model, and it runs locally against your own API key.</figcaption>
+    </figure>
+
+    <p>The ledger stores the exact sentence each claim relies on
+    (<code>stored_quote</code>). That is what makes drift detectable: if the
+    live source no longer contains the stored quote, the weekly check flags
+    it — even though the link itself still works.</p>
+
+    <h2>Verdict vocabulary</h2>
+    <table>
+      <caption>Five verdicts. Partial matches are labeled, never silently upgraded.</caption>
+      <thead>
+        <tr><th scope="col">Verdict</th><th scope="col">Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="pill pill-verified">VERIFIED</span></td><td>The stored source quote appears verbatim in the live source, and every number in the claim appears in the quote.</td></tr>
+        <tr><td><span class="pill pill-snippet">VERIFIED-SNIPPET</span></td><td>Partial match — possible source drift or paraphrase. Flagged for human judgment.</td></tr>
+        <tr><td><span class="pill pill-unverified">UNVERIFIED</span></td><td>Source unreachable, access-restricted (e.g. paywalled — never circumvented), quote not found, or the claim's numbers contradict the quote.</td></tr>
+        <tr><td><span class="pill pill-corrected">CORRECTED</span></td><td>Content was fixed in place against the source, with a correction note left in the file.</td></tr>
+        <tr><td><span class="pill pill-na">NOT-APPLICABLE</span></td><td>A human marked the claim as not checkable this way.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Try it</h2>
+    <pre><code>git clone https://github.com/iwyusdaz/tracebook.git
+cd tracebook
+npm test                 # negative test: all seeded fixture errors caught
+npm run extract -- --dry-run   # pipeline plumbing without an API key
+npm run verify &amp;&amp; npm run report</code></pre>
+    <p>See the <a href="demo.html">live demo of the fixture run's ledger</a>,
+    or read the full documentation and honest limits in the
+    <a href="https://github.com/iwyusdaz/tracebook#readme">repository README</a>.</p>
+
+    <h2>Design decisions</h2>
+    <h3>Quote-back matching instead of trust-the-link</h3>
+    <p>A working link says nothing about whether the claim is still backed.
+    Storing the exact source sentence makes verification a string comparison:
+    deterministic, repeatable, and cheap enough to run weekly.</p>
+    <h3>Corrections rewrite content, not just reports</h3>
+    <p>A report nobody acts on rots too. With a human's approval recorded in
+    the ledger (<code>apply_correction: true</code>), TraceBook rewrites the
+    source file in place and leaves a dated correction note next to the fixed
+    sentence. It never corrects anything automatically.</p>
+    <h3>Honest labeling of restricted sources</h3>
+    <p>Paywalled and 403 sources are labeled <code>ACCESS-RESTRICTED</code>.
+    TraceBook never retries with different identities, strips paywalls, or
+    uses workarounds.</p>
+    <h3>The LLM is optional and gated</h3>
+    <p>Only claim extraction needs a model. With placeholder or missing keys
+    the extractor refuses to run and makes zero network calls, and
+    <code>--dry-run</code> produces stubs labeled "DRY RUN – NOT REAL
+    RESULTS" for testing the plumbing only.</p>
+
+    <h2>Evidence: the negative test</h2>
+    <p>The repository ships a fixture content set with five seeded errors (a
+    wrong statistic, a stale version string, a dead link, a paywalled source,
+    drifted wording) plus one correct control claim. The mandatory test
+    <code>npm test</code> proves the pipeline catches <strong>all of them</strong> —
+    39 assertions, exit code 0 only when every seeded error is caught:
+    1 verified, 1 snippet-verified, 4 unverified. See the
+    <a href="demo.html">fixture ledger</a> and the
+    <a href="https://github.com/iwyusdaz/tracebook/blob/main/evaluation/METHODS.md">methods note</a>.</p>
+
+    <h2>Honest limits</h2>
+    <ul>
+      <li>Verification quality depends on source accessibility; paywalled sources stay honestly labeled UNVERIFIED.</li>
+      <li>Quote-back matching can false-positive on heavily paraphrased sources — those are labeled VERIFIED-SNIPPET and require human review.</li>
+      <li>The extractor needs an API key (one small call set per document); everything else runs offline-capable.</li>
+      <li>Supported content formats today: Markdown, HTML, plain text. DOCX must be converted first.</li>
+      <li>Claim extraction is LLM-based and imperfect: it can miss claims or propose wrong sources. The human gate exists for this reason.</li>
+    </ul>
+
+    <h2>AI-disclosure</h2>
+    <p>This repository, including its code and documentation, was authored
+    with AI assistance and reviewed by the repository owner. The fixture
+    content and source pages are fictional and labeled as such. No real
+    learners, educators, or publications were involved in the fixture run.</p>
+  </main>
+
+  <footer class="site">
+    <p>TraceBook — MIT-licensed code, CC BY 4.0 documentation.
+    Built by <a href="https://github.com/iwyusdaz">iwyusdaz</a>.
+    Inspired by K-Dense-AI/scientific-agent-skills and Panniantong/Agent-Reach (see <a href="https://github.com/iwyusdaz/tracebook/blob/main/ATTRIBUTION.md">ATTRIBUTION.md</a>).</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,166 @@
+/* TraceBook case-study site — plain CSS, no frameworks.
+   Accessibility: text contrast >= 4.5:1, visible focus, no animation
+   except a respect for prefers-reduced-motion, reflows at 320px. */
+
+:root {
+  --ink: #1c2430;        /* body text on paper: 13.9:1 */
+  --paper: #ffffff;
+  --muted: #4a5568;      /* 7.4:1 on white */
+  --accent: #1f4e79;     /* links: 8.6:1 on white */
+  --accent-dark: #14385a;
+  --ok-bg: #e6f2e6;
+  --ok-ink: #1e4d1e;     /* 8.3:1 on ok-bg */
+  --warn-bg: #fdf0d9;
+  --warn-ink: #6b4a00;   /* 6.9:1 on warn-bg */
+  --bad-bg: #fbe9e7;
+  --bad-ink: #8c2b1d;    /* 7.0:1 on bad-bg */
+  --snippet-bg: #e8eef7;
+  --snippet-ink: #1f3a5f;
+  --line: #c9d1dc;
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 100%; }
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.6;
+}
+
+main, footer { max-width: 46rem; margin: 0 auto; padding: 0 1rem; }
+
+header.site {
+  border-bottom: 3px solid var(--accent);
+  background: var(--paper);
+}
+
+header.site .inner {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+}
+
+header.site .wordmark {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--accent-dark);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+header.site .wordmark span { color: var(--muted); font-weight: 400; }
+
+h1, h2, h3 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+h1 { font-size: 1.9rem; margin: 1.5rem 0 0.75rem; }
+h2 { font-size: 1.3rem; margin: 2rem 0 0.5rem; }
+h3 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-dark); }
+
+:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--paper);
+  color: var(--accent-dark);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--accent-dark);
+}
+.skip-link:focus { left: 0.5rem; top: 0.5rem; z-index: 10; }
+
+code, pre, .mono {
+  font-family: "SF Mono", Consolas, Menlo, monospace;
+  font-size: 0.92em;
+}
+
+pre {
+  background: #f2f5f8;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  line-height: 1.45;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+  margin: 1rem 0;
+}
+
+th, td {
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #eef2f6;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+caption {
+  text-align: left;
+  font-style: italic;
+  color: var(--muted);
+  padding: 0.4rem 0;
+}
+
+.pill {
+  display: inline-block;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pill-verified { background: var(--ok-bg); color: var(--ok-ink); }
+.pill-snippet { background: var(--snippet-bg); color: var(--snippet-ink); }
+.pill-unverified { background: var(--bad-bg); color: var(--bad-ink); }
+.pill-corrected { background: var(--warn-bg); color: var(--warn-ink); }
+.pill-na { background: #eef0f2; color: var(--muted); }
+
+.notice {
+  border-left: 4px solid var(--accent);
+  background: #f2f6fa;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.notice-strong {
+  border-left: 4px solid var(--warn-ink);
+  background: var(--warn-bg);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+footer.site {
+  border-top: 1px solid var(--line);
+  margin-top: 3rem;
+  padding: 1rem 1rem 2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a { transition: color 120ms ease; }
+}

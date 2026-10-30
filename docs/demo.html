@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live demo — TraceBook fixture ledger</title>
+  <meta name="description" content="The actual claims ledger produced by running TraceBook's verify and report steps on the repository's test fixtures: five seeded errors and one control claim.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site">
+    <div class="inner">
+      <a class="wordmark" href="index.html">TraceBook <span>· course content in, evidence ledger out</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <h1>Live demo: the fixture run's claims ledger</h1>
+
+    <p class="notice">This is the <strong>actual output</strong> of
+    <code>npm run verify</code> and <code>npm run report</code> on the
+    repository's test fixtures — fictional content with <strong>five seeded
+    errors and one correct control claim</strong>. Fixture source URLs point
+    at a local server (<code>127.0.0.1:8641</code>) that only runs during
+    <code>npm test</code>; that is why the links here are local addresses.
+    The result: 1 verified · 1 snippet-verified · 4 unverified. The pipeline
+    refused to green-light every seeded error.</p>
+
+    <p class="notice-strong"><strong>Reminder:</strong> a green ledger surfaces
+    claims for human judgment. It does not certify content as "fact-checked."</p>
+
+    <h2>Summary</h2>
+    <p>6 claim(s) · 1 verified · 1 snippet-verified · 4 unverified · 0 corrected · 0 not-applicable</p>
+
+    <h2>The ledger</h2>
+    <table>
+      <caption>Every row is one factual claim with its source, verdict, and machine-generated verification note.</caption>
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Claim</th>
+          <th scope="col">Seeded error / purpose</th>
+          <th scope="col">Verdict</th>
+          <th scope="col">Verification note (from verify.mjs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>C001</td>
+          <td>"Large-scale randomized studies show that high-impact tutoring lifts achievement by 0.41 standard deviations on average."</td>
+          <td><strong>Wrong statistic.</strong> The source says 0.10–0.20 SD.</td>
+          <td><span class="pill pill-unverified">UNVERIFIED</span></td>
+          <td><code>NUMERIC-MISMATCH</code> — the stored quote was found in the source, but the claim states number(s) [0.41] that do not appear in the quote.</td>
+        </tr>
+        <tr>
+          <td>C002</td>
+          <td>"Spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies."</td>
+          <td>Control: a correct claim.</td>
+          <td><span class="pill pill-verified">VERIFIED</span></td>
+          <td><code>QUOTE-FOUND</code> — stored quote found verbatim in the live source; numbers consistent.</td>
+        </tr>
+        <tr>
+          <td>C003</td>
+          <td>"One 2024 randomized trial found that structured tutoring reduced course dropout by 18 percent."</td>
+          <td><strong>Paywalled source</strong> (HTTP 403).</td>
+          <td><span class="pill pill-unverified">UNVERIFIED</span></td>
+          <td><code>ACCESS-RESTRICTED</code> — source returned HTTP 403 (paywalled or blocks automated access). Labeled honestly; the source was not circumvented.</td>
+        </tr>
+        <tr>
+          <td>C004</td>
+          <td>"As of this writing, the CourseKit platform runs on version 3.8.5."</td>
+          <td><strong>Stale version string.</strong> The live changelog says 4.2.1.</td>
+          <td><span class="pill pill-unverified">UNVERIFIED</span></td>
+          <td><code>QUOTE-NOT-FOUND</code> — similarity 0.67. Either the source changed (content drift), the quote was mis-transcribed, or the source never contained it.</td>
+        </tr>
+        <tr>
+          <td>C005</td>
+          <td>"Retrieval practice strengthens memory more than rereading in most classroom experiments."</td>
+          <td><strong>Drifted wording</strong> (source now says "restudying").</td>
+          <td><span class="pill pill-snippet">VERIFIED-SNIPPET</span></td>
+          <td><code>PARTIAL-MATCH</code> — similarity 0.86. Possible content drift or paraphrase. Human judgment required; never treated as fully verified.</td>
+        </tr>
+        <tr>
+          <td>C006</td>
+          <td>"The 2019 accreditation guideline requires programs to publish their evidence base annually."</td>
+          <td><strong>Dead link</strong> (HTTP 404).</td>
+          <td><span class="pill pill-unverified">UNVERIFIED</span></td>
+          <td><code>SOURCE-UNREACHABLE</code> — source unreachable (HTTP 404).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>What the negative test adds</h2>
+    <p><code>npm test</code> runs this exact pipeline and asserts every verdict
+    above, plus: the extractor refuses placeholder API keys with zero network
+    calls; <code>--dry-run</code> writes stubs labeled "DRY RUN – NOT REAL
+    RESULTS"; <code>report --correct</code> rewrites the wrong statistic in
+    place with a dated correction note; and the weekly rot-check flags the
+    dead link (<code>LINK-ROT</code>), the paywall
+    (<code>ACCESS-RESTRICTED</code>), and both changed sources
+    (<code>CONTENT-DRIFT</code>) — then opens no duplicate findings on the
+    next run. 39 assertions, all passing.</p>
+
+    <p>Machine-readable ledger:
+    <a href="https://github.com/iwyusdaz/tracebook/blob/main/ledger/claims-verified.json">ledger/claims-verified.json</a> ·
+    Markdown version: <a href="https://github.com/iwyusdaz/tracebook/blob/main/CLAIMS.md">CLAIMS.md</a></p>
+  </main>
+
+  <footer class="site">
+    <p>TraceBook — MIT-licensed code, CC BY 4.0 documentation.
+    Built by <a href="https://github.com/iwyusdaz">iwyusdaz</a>.</p>
+  </footer>
+</body>
+</html>
