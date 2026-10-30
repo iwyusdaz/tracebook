@@ -1,15 +1,20 @@
-# Agent review record
+# Build-time notes (recorded by the builder agent)
 
-## Review setup
+> **What this file is:** notes recorded by the builder agent during the
+> build, capturing issues it found and fixed in its own work. This is **not**
+> an independent review — the author is grading its own homework. The
+> independent review of this repository lives in `evaluation/agent-review.md`;
+> neither is a substitute for human review.
 
-- **Method:** Agent heuristic review (structured), performed by a reviewer
-  agent in a fresh context after the build was complete.
+## Context
+
+- **Author:** the builder agent, mid-build (not a separate reviewer).
 - **Date:** 2026-10-31
-- **Disclosed limitation:** the reviewer agent may run on the same
-  underlying model family as the authoring agent. This is not independent
-  human review; it is a gap-finding pass, not expert endorsement.
+- **Disclosed limitation:** the builder agent runs on the same underlying
+  model family as the authoring process, and the findings below are its own
+  mid-build fixes — not an evaluation by a separate party.
 
-## Scope of review
+## Scope of the build-time pass
 
 1. Honesty: no claim anywhere equates a green ledger with "fact-checked
    content"; restricted sources are labeled, not circumvented; dry-run and
@@ -27,7 +32,7 @@
 | 3 | Weekly workflow would open noise issues for the fixture-only demo ledger (localhost URLs unreachable in CI). | Added a guard step that skips the scheduled run while every `source_url` is local; documented in the workflow. |
 | 4 | Verifier note wording ("does NOT circumvent") did not match the test's assertion vocabulary. | Aligned to "not circumvented"; phrasing now asserted by the test. |
 
-## Items the reviewer could not verify
+## Items the builder could not verify
 
 - Real-model extraction quality (no API key in the build environment).
 - The GitHub Action's issue-opening path on a live repository (requires the

@@ -33,8 +33,8 @@ versioning follows [Semantic Versioning](https://semver.org/).
   dry-run labeling, in-place correction, and rot-check state diffing.
 - `docs/` — accessible static case-study site with a live demo of the
   fixture run's ledger.
-- `evaluation/METHODS.md`, `evaluation/agent-review.md`,
-  `evaluation/human-protocol/` — methods note, review record, and the
+- `evaluation/METHODS.md`, `evaluation/build-notes.md`,
+  `evaluation/human-protocol/` — methods note, build-time notes, and the
   human-review protocol for verdicts.
 - Demo artifacts: `ledger/claims.json` (pre-verify template),
   `ledger/claims-verified.json`, and `CLAIMS.md`.
