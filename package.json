@@ -1,0 +1,32 @@
+{
+  "name": "tracebook",
+  "version": "1.0.0",
+  "description": "Course content in, evidence ledger out. Extracts factual claims from curriculum content, verifies each against primary sources via deterministic quote-back matching, and emits a versioned claims ledger with weekly claims-rot checking.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "tracebook": "src/cli.mjs"
+  },
+  "scripts": {
+    "extract": "node src/extract.mjs",
+    "verify": "node src/verify.mjs",
+    "report": "node src/report.mjs",
+    "rot-check": "node src/rot-check.mjs",
+    "test": "node tests/negative-test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iwyusdaz/tracebook.git"
+  },
+  "keywords": [
+    "curriculum-development",
+    "evidence",
+    "fact-checking",
+    "instructional-design",
+    "github-action",
+    "research-tools"
+  ]
+}

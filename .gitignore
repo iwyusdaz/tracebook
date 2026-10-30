@@ -1,0 +1,22 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Dry-run stubs (never real results)
+dry-run/
+
+# Negative-test scratch space
+tests/.tmp/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+.idea/
+.vscode/
