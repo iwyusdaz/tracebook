@@ -1,0 +1,69 @@
+# TraceBook weekly claims-rot check.
+#
+# Runs every Monday at 06:00 UTC and on manual dispatch. Re-fetches every
+# source_url in ledger/claims-verified.json, diffs findings against the last
+# run (ledger/rot-state.json), and opens one GitHub issue per NEW finding
+# (link rot, access restriction, or content drift).
+#
+# NOTE: validated for YAML syntax locally before push; the issue-opening path
+# cannot be fully exercised until the repo exists on GitHub (it needs
+# GITHUB_TOKEN + GITHUB_REPOSITORY, which only exist inside Actions).
+
+name: Weekly claims-rot check
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: tracebook-rot-check
+  cancel-in-progress: false
+
+jobs:
+  rot-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The committed demo ledger points at local fixture sources
+      # (127.0.0.1:8641, only alive during `npm test`). Skip the scheduled
+      # run until a real ledger with public source URLs replaces it.
+      - name: Skip if ledger is fixture-only
+        id: guard
+        run: |
+          if [ ! -f ledger/claims-verified.json ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No ledger/claims-verified.json yet — nothing to check."
+            exit 0
+          fi
+          if node -e '
+            const l = require("./ledger/claims-verified.json");
+            const urls = l.claims.map(c => c.source_url).filter(Boolean);
+            process.exit(urls.length > 0 && urls.every(u => /^https?:\/\/(127\.0\.0\.1|localhost)/.test(u)) ? 0 : 1);
+          '; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Ledger only references local fixture sources — skipping."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: TraceBook claims-rot check
+        if: steps.guard.outputs.skip != 'true'
+        uses: ./action
+        with:
+          ledger-path: ledger/claims-verified.json
+          open-issues: 'true'
+
+      - name: Upload rot report (always)
+        if: always() && steps.guard.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rot-report
+          path: ledger/rot-report.json
+          if-no-files-found: warn

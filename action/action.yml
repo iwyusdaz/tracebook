@@ -1,0 +1,73 @@
+name: 'TraceBook claims-rot check'
+description: >
+  Re-fetches every source_url in a TraceBook claims ledger, flags link rot,
+  access restrictions and content drift (stored quotes no longer present in
+  the live source), and opens one GitHub issue per NEW finding.
+author: 'iwyusdaz'
+branding:
+  icon: 'book-open'
+  color: 'blue'
+
+inputs:
+  ledger-path:
+    description: 'Path (relative to the calling repo) of the claims ledger to check.'
+    required: false
+    default: 'ledger/claims-verified.json'
+  state-path:
+    description: 'Path of the rot-state file used to diff new vs. known findings.'
+    required: false
+    default: 'ledger/rot-state.json'
+  report-path:
+    description: 'Where the rot report is written.'
+    required: false
+    default: 'ledger/rot-report.json'
+  open-issues:
+    description: 'Open one GitHub issue per new finding (needs issues: write).'
+    required: false
+    default: 'true'
+  concurrency:
+    description: 'How many URLs to fetch in parallel.'
+    required: false
+    default: '4'
+
+outputs:
+  findings-count:
+    description: 'Total findings in this run.'
+    value: ${{ steps.rot.outputs.findings_count }}
+  new-findings-count:
+    description: 'Findings that were not present in the previous run.'
+    value: ${{ steps.rot.outputs.new_findings_count }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Run TraceBook rot-check
+      id: rot
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        set -o pipefail
+        ARGS=(--ledger "${{ inputs.ledger-path }}" --state "${{ inputs.state-path }}" --report "${{ inputs.report-path }}" --concurrency "${{ inputs.concurrency }}")
+        if [ "${{ inputs.open-issues }}" = "true" ]; then ARGS+=(--open-issues); fi
+        set +e
+        node "$GITHUB_ACTION_PATH/../src/rot-check.mjs" "${ARGS[@]}"
+        EXIT_CODE=$?
+        set -e
+        if [ ! -f "${{ inputs.report-path }}" ]; then
+          echo "::error::rot-check produced no report at ${{ inputs.report-path }} — does the ledger exist?"
+          exit 1
+        fi
+        FINDINGS=$(node -e "const r=require('./${{ inputs.report-path }}');console.log(r.findings_total ?? 0)")
+        NEW=$(node -e "const r=require('./${{ inputs.report-path }}');console.log(r.findings_new ?? 0)")
+        echo "findings_count=$FINDINGS" >> "$GITHUB_OUTPUT"
+        echo "new_findings_count=$NEW" >> "$GITHUB_OUTPUT"
+        # Exit code 2 means "findings present" — informative, not a workflow failure.
+        # Any other non-zero exit is a real error.
+        if [ "$EXIT_CODE" -ne 0 ] && [ "$EXIT_CODE" -ne 2 ]; then exit "$EXIT_CODE"; fi
+        exit 0
