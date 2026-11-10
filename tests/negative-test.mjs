@@ -10,7 +10,8 @@
 //   C006 dead link         -> UNVERIFIED (SOURCE-UNREACHABLE)
 //
 // Also proves:
-//   - extract refuses placeholder MODEL_A_* with exit 1 and no network calls
+//   - extract is agent-run: no API key, no network code, imports only claims
+//     found verbatim in the content, computes file:line locally
 //   - extract --dry-run writes "DRY RUN – NOT REAL RESULTS" stubs, no network
 //   - report --correct rewrites content in place with a correction note
 //   - rot-check re-flags drift/rot and diffs findings between runs
@@ -63,15 +64,39 @@ console.log("TraceBook negative test\n=======================");
 rmSync(TMP, { recursive: true, force: true });
 mkdirSync(TMP, { recursive: true });
 
-// --- 1. Placeholder refusal: must exit 1 BEFORE any network call -----------
-console.log("\n[1] extract refuses placeholder MODEL_A_* config");
-const refusal = await run("extract.mjs", ["--content", "test-fixtures/content"], {
-  MODEL_A_BASE_URL: "", MODEL_A_API_KEY: "", MODEL_A_NAME: "",
-});
-check("exit code is 1", refusal.code === 1, `got ${refusal.code}`);
-check("message names the missing settings", /MODEL_A_(BASE_URL|API_KEY|NAME)/.test(refusal.out), refusal.out.slice(0, 200));
-check("message states no network calls were made", /NO network calls/i.test(refusal.out));
-
+// --- 1. Agent-run extract: no key, no network, verbatim-only import --------
+console.log("\n[1] extract is agent-run: no API key, no network, verbatim-only import");
+const extractSrc = readFileSync(join(ROOT, "src", "extract.mjs"), "utf8");
+check("extract.mjs has no network or environment-secret code", !/\bfetch\s*\(|process\.env|https?\.request/.test(extractSrc));
+const noMode = await run("extract.mjs", ["--content", "test-fixtures/content"]);
+check("no mode chosen -> exit code 1", noMode.code === 1, `got ${noMode.code}`);
+check("message explains the agent-run modes", /--prepare/.test(noMode.out) && /--claims/.test(noMode.out), noMode.out.slice(0, 200));
+const requestPath = join(TMP, "request.md");
+const prep = await run("extract.mjs", ["--prepare", "--content", "test-fixtures/content", "--request", requestPath]);
+check("--prepare exits 0", prep.code === 0, prep.out.slice(0, 200));
+const requestText = existsSync(requestPath) ? readFileSync(requestPath, "utf8") : "";
+check("request carries instructions and every content file",
+  /VERBATIM/.test(requestText) && requestText.includes("module-1-tutoring.md") && requestText.includes("module-2-platform.md"));
+const agentClaimsPath = join(TMP, "agent-claims.json");
+writeFileSync(agentClaimsPath, JSON.stringify({ claims: [
+  // Verbatim claim that wraps across two lines in the fixture file.
+  { claim: "high-impact tutoring lifts achievement by 0.41 standard deviations on average", source_url: null, source_publisher: null, confidence: "high" },
+  // Not in the content: must be rejected, never imported.
+  { claim: "Tutoring doubles graduation rates in every district studied", source_url: null, source_publisher: null, confidence: "high" },
+] }));
+const agentLedgerPath = join(TMP, "agent-ledger.json");
+const imp = await run("extract.mjs", ["--claims", agentClaimsPath, "--content", "test-fixtures/content", "--out", agentLedgerPath, "--extractor", "negative-test fixture"]);
+check("--claims import exits 0", imp.code === 0, imp.out.slice(0, 300));
+const agentLedger = existsSync(agentLedgerPath) ? JSON.parse(readFileSync(agentLedgerPath, "utf8")) : { claims: [] };
+check("only the verbatim claim is imported", agentLedger.claims.length === 1, `got ${agentLedger.claims.length}`);
+check("location computed locally (module-1-tutoring.md:13)", agentLedger.claims[0]?.location === "test-fixtures/content/module-1-tutoring.md:13", `got ${agentLedger.claims[0]?.location}`);
+check("non-verbatim claim reported as rejected", agentLedger.extract_method?.rejected_not_verbatim === 1 && /Rejected 1 claim/.test(imp.out));
+check("ledger labels the method agent-run and leaves stored_quote for the human",
+  agentLedger.extract_method?.type === "agent-run" && agentLedger.claims[0]?.stored_quote === "");
+writeFileSync(agentClaimsPath, JSON.stringify({ claims: [{ claim: "Tutoring doubles graduation rates in every district studied" }] }));
+const allBadOut = join(TMP, "agent-ledger-bad.json");
+const allBad = await run("extract.mjs", ["--claims", agentClaimsPath, "--content", "test-fixtures/content", "--out", allBadOut]);
+check("all claims non-verbatim -> exit 1, nothing written", allBad.code === 1 && !existsSync(allBadOut), `got ${allBad.code}`);
 // --- 2. Dry run: labeled stubs, no network ---------------------------------
 console.log("\n[2] extract --dry-run writes labeled stubs");
 const dry = await run("extract.mjs", ["--dry-run", "--content", "test-fixtures/content"]);

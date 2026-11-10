@@ -1,5 +1,10 @@
 # Build-time notes (recorded by the builder agent)
 
+> **Archived history note (2026-10-31).** This records the repository as it
+> was at v1.0.0, when the extract step called a model endpoint. Since v1.1.0
+> extraction is agent-run with no API key; see `evaluation/METHODS.md` for
+> the current state.
+
 > **What this file is:** notes recorded by the builder agent during the
 > build, capturing issues it found and fixed in its own work. This is **not**
 > an independent review — the author is grading its own homework. The

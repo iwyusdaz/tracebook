@@ -22,8 +22,8 @@
     <code>npm run verify</code> and <code>npm run report</code> on the
     repository's test fixtures — fictional content with <strong>five seeded
     errors and one correct control claim</strong>. The fixture ledger's
-    claims and stored quotes were <strong>hand-authored</strong> (the extract
-    step needs an API key); only the verdicts and verification notes below
+    claims and stored quotes were <strong>hand-authored</strong> to isolate
+    the deterministic steps; only the verdicts and verification notes below
     come from the pipeline. Fixture source URLs point
     at a local server (<code>127.0.0.1:8641</code>) that only runs during
     <code>npm test</code>; that is why the links here are local addresses.
@@ -96,14 +96,14 @@
 
     <h2>What the negative test adds</h2>
     <p><code>npm test</code> runs this exact pipeline and asserts every verdict
-    above, plus: the extractor refuses placeholder API keys with zero network
-    calls; <code>--dry-run</code> writes stubs labeled "DRY RUN – NOT REAL
+    above, plus: the agent-run extractor imports only claims found verbatim
+    in the content and makes no network calls; <code>--dry-run</code> writes stubs labeled "DRY RUN – NOT REAL
     RESULTS"; <code>report --correct</code> rewrites the wrong statistic in
     place with a dated correction note; and the weekly rot-check flags the
     dead link (<code>LINK-ROT</code>), the paywall
     (<code>ACCESS-RESTRICTED</code>), and both changed sources
     (<code>CONTENT-DRIFT</code>) — then opens no duplicate findings on the
-    next run. 39 assertions, all passing.</p>
+    next run. 47 assertions, all passing.</p>
 
     <p>Machine-readable ledger:
     <a href="https://github.com/iwyusdaz/tracebook/blob/main/ledger/claims-verified.json">ledger/claims-verified.json</a> ·

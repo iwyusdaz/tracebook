@@ -4,6 +4,25 @@ All notable changes to TraceBook are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-11-10
+
+### Changed
+
+- `src/extract.mjs` is now agent-run: `--prepare` writes an extraction
+  request for the user's AI agent, and `--claims FILE` imports the agent's
+  JSON answer. No API key, no `.env`, and no network calls. Claims not found
+  verbatim in the content are rejected; `file:line` is computed locally.
+- Negative test section [1] now covers the agent-run import (47 assertions).
+
+### Removed
+
+- `.env.example` and the `MODEL_A_*` model-endpoint configuration.
+
+### Added
+
+- `evaluation/agent-extract-fixture-run/`: one agent-run extraction on the
+  fixture content by the build agent, labeled as such.
+
 ## [1.0.0] - 2026-10-31
 
 ### Added

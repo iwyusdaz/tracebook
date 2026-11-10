@@ -1,7 +1,7 @@
 // TraceBook shared helpers — deterministic, zero dependencies (Node built-ins only).
 // Everything in this file is used by verify.mjs, report.mjs and rot-check.mjs.
-// The LLM-based extractor (extract.mjs) only reuses the placeholder checks;
-// verification itself never touches a model.
+// The agent-run extractor (extract.mjs) reuses the HTML and ledger helpers;
+// no step in the pipeline calls a model.
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -17,48 +17,6 @@ export const VERDICTS = [
 
 export const USER_AGENT =
   "tracebook/1.0 (claim source verification; https://github.com/iwyusdaz/tracebook)";
-
-// ---------------------------------------------------------------------------
-// Placeholder / secret hygiene
-// ---------------------------------------------------------------------------
-
-const PLACEHOLDER_PATTERNS = [
-  /^$/,
-  /^your[_-].*here$/i,
-  /placeholder/i,
-  /changeme/i,
-  /^xxx+$/i,
-  /^\$\{.*\}$/,
-];
-
-/** True if a value looks like a placeholder that must never trigger network use. */
-export function isPlaceholder(value) {
-  if (value === undefined || value === null) return true;
-  const v = String(value).trim();
-  return PLACEHOLDER_PATTERNS.some((re) => re.test(v));
-}
-
-/** Minimal .env reader (KEY=VALUE lines, # comments). Does not override real env vars. */
-export function readDotEnv(envPath) {
-  const out = {};
-  if (!existsSync(envPath)) return out;
-  for (const line of readFileSync(envPath, "utf8").split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eq = trimmed.indexOf("=");
-    if (eq === -1) continue;
-    const key = trimmed.slice(0, eq).trim();
-    let val = trimmed.slice(eq + 1).trim();
-    if (
-      (val.startsWith('"') && val.endsWith('"')) ||
-      (val.startsWith("'") && val.endsWith("'"))
-    ) {
-      val = val.slice(1, -1);
-    }
-    if (!(key in process.env)) out[key] = val;
-  }
-  return out;
-}
 
 // ---------------------------------------------------------------------------
 // Fetching (deterministic; paywalled / restricted sources are labeled, never circumvented)

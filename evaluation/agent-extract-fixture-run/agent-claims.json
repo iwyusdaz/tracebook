@@ -1,0 +1,11 @@
+{
+  "claims": [
+    { "claim": "Large-scale randomized studies show that high-impact tutoring lifts achievement by 0.41 standard deviations on average.", "source_url": null, "source_publisher": null, "confidence": "high" },
+    { "claim": "spaced practice typically improves long-term retention by 10 to 30 percent compared with massed practice in classroom studies.", "source_url": null, "source_publisher": null, "confidence": "high" },
+    { "claim": "One 2024 randomized trial found that structured tutoring reduced course dropout by 18 percent.", "source_url": null, "source_publisher": null, "confidence": "high" },
+    { "claim": "Retrieval practice strengthens memory more than rereading in most classroom experiments.", "source_url": null, "source_publisher": null, "confidence": "medium" },
+    { "claim": "As of this writing, the CourseKit platform runs on version 3.8.5.", "source_url": null, "source_publisher": null, "confidence": "high" },
+    { "claim": "Programs in our department renew accreditation on a four-year cycle.", "source_url": null, "source_publisher": null, "confidence": "low" },
+    { "claim": "The 2019 accreditation guideline requires programs to publish their evidence base annually.", "source_url": null, "source_publisher": null, "confidence": "high" }
+  ]
+}

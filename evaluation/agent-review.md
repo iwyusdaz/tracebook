@@ -1,5 +1,10 @@
 # Agent review (independent)
 
+> **Archived history note (2026-10-31).** This records the repository as it
+> was at v1.0.0, when the extract step called a model endpoint. Since v1.1.0
+> extraction is agent-run with no API key; see `evaluation/METHODS.md` for
+> the current state.
+
 ## Review setup
 
 - **Method:** fresh-context agent review, conducted after the build was

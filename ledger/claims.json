@@ -1,7 +1,7 @@
 {
   "ledger_version": "1.0",
   "generated": "2026-10-31T00:00:00.000Z",
-  "generator": "hand-authored fixture ledger (claims and stored_quote values written by hand, not extracted by the LLM step)",
+  "generator": "hand-authored fixture ledger (claims and stored_quote values written by hand, not produced by the extract step)",
   "note": "A claims ledger surfaces factual claims and evidence for HUMAN JUDGMENT. A green ledger does NOT mean the content is 'fact-checked' or certified. The content in test-fixtures/ is FICTIONAL with SEEDED errors; source_urls point at a local fixture server (127.0.0.1:8641) started by `npm test`.",
   "claims": [
     {

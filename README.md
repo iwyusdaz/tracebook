@@ -8,10 +8,11 @@ silently.
 
 **[Live demo](https://iwyusdaz.github.io/tracebook/) · [Fixture ledger](https://iwyusdaz.github.io/tracebook/demo.html) · Role: Sole designer & developer**
 
-> **Evaluation status:** The fixture negative test (39 assertions) passes and
-> all seeded errors are caught. No real-world curriculum corpus has been run
-> through the full pipeline yet (the extract step requires an API key — see
-> [Honest limits](#honest-limits)). See `evaluation/METHODS.md`.
+> **Evaluation status:** The fixture negative test (47 assertions) passes and
+> all seeded errors are caught. The extract step is agent-run and needs no API
+> key; it has been run once, by the build agent, on the fixture content only.
+> No real-world curriculum corpus has been run through the full pipeline yet
+> (see [Honest limits](#honest-limits)). See `evaluation/METHODS.md`.
 
 ---
 
@@ -37,8 +38,9 @@ citations that stay honest.
 ```
 curriculum content (md / html / txt)
   │
-  ├─ 1. EXTRACT      src/extract.mjs — LLM (BYO OpenAI-compatible key) pulls
-  │                  atomic factual claims with file:line locations
+  ├─ 1. EXTRACT      src/extract.mjs: your AI agent pulls atomic factual
+  │                  claims; the script imports only verbatim claims and
+  │                  computes file:line locations (no API key, no network)
   ├─ 2. LEDGER       ledger/claims.json — the HUMAN GATE: you read each source
   │                  and record the exact source sentence (stored_quote)
   ├─ 3. VERIFY       src/verify.mjs — deterministic fetch + quote-back match;
@@ -58,18 +60,21 @@ sentence the claim relies on, so verification is a string comparison —
 deterministic, repeatable, and cheap enough to run weekly. A working link is
 not evidence; the stored quote is what makes drift detectable.
 
-Only step 1 uses a language model. Steps 3–5 are plain Node scripts with
-zero dependencies.
+Only step 1 involves AI, and it runs through an agent you already use (for
+example a coding agent in your editor or terminal), not through an API key.
+The script itself never calls a model. Steps 3 to 5 are plain Node scripts
+with zero dependencies.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/iwyusdaz/tracebook.git
 cd tracebook
-npm test                        # negative test: all seeded errors caught (no key needed)
-npm run extract -- --dry-run    # pipeline plumbing without an API key (no network)
-cp .env.example .env            # then add MODEL_A_* values for real extraction
-npm run extract                 # 1. extract claims (needs key)
+npm test                        # negative test: all seeded errors caught
+npm run extract -- --prepare --content <dir>   # 1a. write extract-work/request.md
+#    give request.md to your AI agent; it writes extract-work/agent-claims.json
+npm run extract -- --claims extract-work/agent-claims.json --content <dir> \
+  --extractor "<agent and model name>"         # 1b. import verbatim claims only
 #    human gate: read sources, fill stored_quote in ledger/claims.json
 npm run verify                  # 3. deterministic verification
 npm run report                  # 4. CLAIMS.md + summary counts
@@ -77,7 +82,9 @@ npm run report -- --correct     #    apply human-approved corrections in place
 npm run rot-check               # 5. one-off rot check (also runs weekly in CI)
 ```
 
-Requirements: Node 20+. No `npm install` — there are no dependencies.
+Requirements: Node 20+. No `npm install` (there are no dependencies) and no
+API key. `npm run extract -- --dry-run` writes labeled stubs to test the
+plumbing only.
 
 ### Using the GitHub Action in your own repo
 
@@ -110,18 +117,28 @@ control claim, and asserts the exact verdict for each:
 | C005 | Drifted wording ("rereading" vs "restudying") | VERIFIED-SNIPPET — flagged, never silently upgraded |
 | C006 | Dead link (HTTP 404) | UNVERIFIED — `SOURCE-UNREACHABLE` |
 
-**Result: 39/39 assertions pass; the pipeline refuses to green-light every
-seeded error.** The test also proves: the extractor refuses placeholder keys
-with zero network calls; `--dry-run` writes stubs labeled "DRY RUN – NOT
-REAL RESULTS" and makes no network calls; `report --correct` rewrites the
-wrong statistic in place with a dated correction note; and the rot-check
-flags the dead link, the paywall, and both changed sources — with no
-duplicate findings on the second run.
+**Result: 47/47 assertions pass; the pipeline refuses to green-light every
+seeded error.** The test also proves: the extractor contains no network
+code; it imports only claims found verbatim in the content, rejects the
+rest, and computes `file:line` itself; `--dry-run` writes stubs labeled
+"DRY RUN – NOT REAL RESULTS"; `report --correct` rewrites the wrong
+statistic in place with a dated correction note; and the rot-check flags the
+dead link, the paywall, and both changed sources, with no duplicate findings
+on the second run.
+
+**Agent-run extraction on the fixtures:** the build agent (Kiro) followed
+`npm run extract -- --prepare` on the two fixture files and returned 7
+claims; all 7 passed the verbatim import check, and all 6 seeded claims were
+among them (the 7th is the department's four-year accreditation cycle). This
+shows the agent-run path works end to end. It is not a measure of
+extraction quality: the agent knew which claims were seeded, and it is one
+run by one agent. Output: `evaluation/agent-extract-fixture-run/`.
 
 **What this evidence can and cannot show:** it proves the deterministic
 pipeline behaves as designed on controlled fixtures. It cannot show how well
-the LLM extractor performs on real curricula, nor that real-world sources
-stay reachable. The full pipeline on a real corpus is pending an API key.
+agent-run extraction performs on real curricula, nor that real-world
+sources stay reachable. No real corpus has been run through the full
+pipeline yet.
 
 **What it led to:** the fixture run's live ledger is published as the demo
 ([docs/demo.html](https://iwyusdaz.github.io/tracebook/demo.html)), and the
@@ -143,9 +160,10 @@ See `evaluation/METHODS.md` for the full methods note.
 3. **Honest labeling of restricted sources** — 401/402/403 sources are
    labeled `ACCESS-RESTRICTED`; the tool never retries with other identities
    or circumvents paywalls.
-4. **The LLM is optional and gated** — placeholder or missing keys produce a
-   clear refusal with zero network calls; `--dry-run` stubs are labeled and
-   quarantined in `dry-run/`.
+4. **Extraction is agent-run and checked on import.** No API key and no
+   network calls: your agent writes a JSON answer, and the script imports
+   only claims that appear verbatim in the content. `--dry-run` stubs are
+   labeled and quarantined in `dry-run/`.
 5. **Machine-verifiable honesty** — partial matches are a separate verdict
    (`VERIFIED-SNIPPET`), so nothing is ever silently upgraded to verified.
 
@@ -158,8 +176,10 @@ See `evaluation/METHODS.md` for the full methods note.
   checks them.
 - Quote-back matching can false-positive on heavily paraphrased sources —
   those land in VERIFIED-SNIPPET and require human review.
-- Claim extraction is LLM-based and imperfect: it can miss claims or propose
-  wrong sources. The human gate exists for this reason.
+- Claim extraction is done by an AI agent and is imperfect: it can miss
+  claims or propose wrong sources. The verbatim import check catches
+  invented claim text, not missed claims. The human gate exists for this
+  reason.
 - Content formats today: Markdown, HTML, plain text. Convert DOCX first.
 - The GitHub Action's issue-opening path is validated for YAML syntax and
   API usage but has not run against a live repository trigger yet.
@@ -188,9 +208,9 @@ limitation, not a claim of conformance.
 
 ## What I'd do differently / next steps
 
-- Dogfood the extractor on a real curriculum corpus and report precision of
-  extracted claims (currently the fixture ledger is hand-authored to isolate
-  the deterministic steps).
+- Dogfood agent-run extraction on a real curriculum corpus and report
+  precision and recall of extracted claims (currently the fixture ledger is
+  hand-authored to isolate the deterministic steps).
 - Add DOCX support via an optional converter.
 - Track per-claim verdict history so drift can be shown over time, not just
   flagged once.
@@ -206,5 +226,8 @@ Inspirations and adopted patterns (not code) are credited in
 This repository was authored with AI assistance and reviewed by the
 repository owner, who takes responsibility for its content. The fixture
 content, sources, and publisher names are fictional and labeled as such.
-No model was run for the committed ledger — the fixture verdicts come from
-the deterministic verifier against local fixture pages.
+No model produced the committed fixture ledger: its claims are
+hand-authored, and its verdicts come from the deterministic verifier against
+local fixture pages. The separate agent-run extraction in
+`evaluation/agent-extract-fixture-run/` was done by the build agent (Kiro)
+and is labeled as such.

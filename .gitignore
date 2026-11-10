@@ -1,10 +1,12 @@
 # Environment / secrets
 .env
 .env.*
-!.env.example
 
 # Dependencies
 node_modules/
+
+# Agent extraction scratch (request + answer files)
+extract-work/
 
 # Dry-run stubs (never real results)
 dry-run/

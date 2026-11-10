@@ -45,14 +45,14 @@
     <figure>
       <svg role="img" aria-labelledby="flow-title flow-desc" viewBox="0 0 640 150" width="100%" style="max-width:640px">
         <title id="flow-title">TraceBook pipeline: extract, verify, report, rot-check</title>
-        <desc id="flow-desc">A five-step flow. Curriculum content feeds EXTRACT (the only LLM step) into a claims ledger, which a human reviews. VERIFY fetches each source and does quote-back matching. REPORT emits CLAIMS.md and applies human-approved corrections in place. A weekly ROT CHECK re-fetches sources and opens an issue per new finding.</desc>
+        <desc id="flow-desc">A five-step flow. Curriculum content feeds EXTRACT (done by your AI agent, no API key) into a claims ledger, which a human reviews. VERIFY fetches each source and does quote-back matching. REPORT emits CLAIMS.md and applies human-approved corrections in place. A weekly ROT CHECK re-fetches sources and opens an issue per new finding.</desc>
         <g font-family="Helvetica, Arial, sans-serif" font-size="12">
           <rect x="8" y="55" width="96" height="40" rx="6" fill="#eef2f6" stroke="#1f4e79"/>
           <text x="56" y="72" text-anchor="middle">curriculum</text>
           <text x="56" y="86" text-anchor="middle">content</text>
           <rect x="140" y="55" width="92" height="40" rx="6" fill="#1f4e79"/>
           <text x="186" y="72" text-anchor="middle" fill="#ffffff">1 EXTRACT</text>
-          <text x="186" y="86" text-anchor="middle" fill="#ffffff">(LLM)</text>
+          <text x="186" y="86" text-anchor="middle" fill="#ffffff">(agent-run)</text>
           <rect x="268" y="55" width="92" height="40" rx="6" fill="#1f4e79"/>
           <text x="314" y="72" text-anchor="middle" fill="#ffffff">2 LEDGER</text>
           <text x="314" y="86" text-anchor="middle" fill="#ffffff">+ human gate</text>
@@ -72,7 +72,7 @@
           <text x="510" y="123" text-anchor="middle" fill="#6b4a00" font-size="11">weekly re-fetch</text>
         </g>
       </svg>
-      <figcaption style="font-size:0.9rem;color:#4a5568">Steps 3–5 are fully deterministic scripts. Only EXTRACT uses a language model, and it runs locally against your own API key.</figcaption>
+      <figcaption style="font-size:0.9rem;color:#4a5568">Steps 3 to 5 are fully deterministic scripts. Only EXTRACT involves AI: your own agent reads a request file and returns claims, and the script imports only claims found verbatim in your content. No API key is needed.</figcaption>
     </figure>
 
     <p>The ledger stores the exact sentence each claim relies on
@@ -99,7 +99,7 @@
     <pre><code>git clone https://github.com/iwyusdaz/tracebook.git
 cd tracebook
 npm test                 # negative test: all seeded fixture errors caught
-npm run extract -- --dry-run   # pipeline plumbing without an API key
+npm run extract -- --prepare   # extraction request for your AI agent
 npm run verify &amp;&amp; npm run report</code></pre>
     <p>See the <a href="demo.html">live demo of the fixture run's ledger</a>,
     or read the full documentation and honest limits in the
@@ -119,18 +119,19 @@ npm run verify &amp;&amp; npm run report</code></pre>
     <p>Paywalled and 403 sources are labeled <code>ACCESS-RESTRICTED</code>.
     TraceBook never retries with different identities, strips paywalls, or
     uses workarounds.</p>
-    <h3>The LLM is optional and gated</h3>
-    <p>Only claim extraction needs a model. With placeholder or missing keys
-    the extractor refuses to run and makes zero network calls, and
-    <code>--dry-run</code> produces stubs labeled "DRY RUN – NOT REAL
-    RESULTS" for testing the plumbing only.</p>
+    <h3>Extraction is agent-run and checked on import</h3>
+    <p>Claim extraction is done by an AI agent you already use. The script
+    writes a request file, your agent answers in JSON, and the script imports
+    only claims that appear verbatim in your content. It needs no API key and
+    makes no network calls. <code>--dry-run</code> produces stubs labeled
+    "DRY RUN – NOT REAL RESULTS" for testing the plumbing only.</p>
 
     <h2>Evidence: the negative test</h2>
     <p>The repository ships a fixture content set with five seeded errors (a
     wrong statistic, a stale version string, a dead link, a paywalled source,
     drifted wording) plus one correct control claim. The mandatory test
-    <code>npm test</code> proves the pipeline catches <strong>all of them</strong> —
-    39 assertions, exit code 0 only when every seeded error is caught:
+    <code>npm test</code> proves the pipeline catches <strong>all of them</strong>.
+    It runs 47 assertions and exits 0 only when every seeded error is caught:
     1 verified, 1 snippet-verified, 4 unverified. See the
     <a href="demo.html">fixture ledger</a> and the
     <a href="https://github.com/iwyusdaz/tracebook/blob/main/evaluation/METHODS.md">methods note</a>.</p>
@@ -139,9 +140,9 @@ npm run verify &amp;&amp; npm run report</code></pre>
     <ul>
       <li>Verification quality depends on source accessibility; paywalled sources stay honestly labeled UNVERIFIED.</li>
       <li>Quote-back matching can false-positive on heavily paraphrased sources — those are labeled VERIFIED-SNIPPET and require human review.</li>
-      <li>The extractor needs an API key (one small call set per document); everything else runs offline-capable.</li>
+      <li>Agent-run extraction has been tried once, by the build agent, on the fixture content only. Its quality on real curricula has not been measured.</li>
       <li>Supported content formats today: Markdown, HTML, plain text. DOCX must be converted first.</li>
-      <li>Claim extraction is LLM-based and imperfect: it can miss claims or propose wrong sources. The human gate exists for this reason.</li>
+      <li>Claim extraction is done by an AI agent and is imperfect: it can miss claims or propose wrong sources. The human gate exists for this reason.</li>
     </ul>
 
     <h2>AI-disclosure</h2>
